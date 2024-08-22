@@ -22,6 +22,17 @@ wcn -et [INDEX] [TEXT] -- Starts an edit procedure to edit the text and reset th
 wcn -m [INDEX_TARGET] [INDEX_DESTINATION] -- Moves the note at INDEX_TARGET to INDEX_DESTINATION, moving as necessary, including both within and between the core and local files.
 ```
 
+## ToDo
+- Add wcnLibrary.py for orchestrating both the core and local file. 
+- Do we need to add a Note wrapper containing file and index?
+- Test scnLibrary just for file existence
+- Add list functionality
+- Add append functionality
+- Add delete functionality
+- Add edit functionality
+- Add move functionality
+
 ## Work Log
+- 8/22/24: Added .gitignore, colors, test script, and models for Note and File. (wplachno)
 - 8/22/24: Added command line deciphering. (wplachno)
 - 8/21/24: Set readme to describe ultimate scope. (wplachno)
