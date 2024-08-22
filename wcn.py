@@ -30,12 +30,12 @@ def decipher_command_line(args):
             cl.type = S.MODE_EDIT_MAJOR
             cl.target = args[2]
             cl.text = args[3]
-            cl.description = S.CL_DESC_EDIT_MAJOR.format(cl.target, cl.text)
+            cl.description = S.CL_DESC_EDIT_MAJOR.format(cl.text, cl.target)
         elif args[1] == S.FLAG_EDIT_MINOR:
             cl.type = S.MODE_EDIT_MINOR
             cl.target = args[2]
             cl.text = args[3]
-            cl.description = S.CL_DESC_EDIT_MINOR.format(cl.target, cl.text)
+            cl.description = S.CL_DESC_EDIT_MINOR.format(cl.text, cl.target)
     elif len(args) == 2:
         if args[1] == S.FLAG_CORE:
             cl.type = S.MODE_LIST_CORE
