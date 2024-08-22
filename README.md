@@ -14,13 +14,14 @@ wcn [TEXT] -- Saves the text with a timestamp in the core file
 wcn -l -- Lists only the notes in the local file
 wcn -c -- Lists only the notes in the core file
 wcn -l [TEXT] -- Saves the text with a timestamp in the core file
-wcn -e [INDEX] -- Starts an edit procedure to edit the text, but not the timestamp, of the note at INDEX
-wcn -et [INDEX] -- Starts an edit procedure to edit the text and reset the timestamp of the note at INDEX
 wcn -d [INDEX] -- Deletes the note with the given index, core or local
 wcn -d -c -- Deletes all notes in the core file
 wcn -d -l -- Deletes all notes in the local file
+wcn -e [INDEX] [TEXT] -- Starts an edit procedure to edit the text, but not the timestamp, of the note at INDEX
+wcn -et [INDEX] [TEXT] -- Starts an edit procedure to edit the text and reset the timestamp of the note at INDEX
 wcn -m [INDEX_TARGET] [INDEX_DESTINATION] -- Moves the note at INDEX_TARGET to INDEX_DESTINATION, moving as necessary, including both within and between the core and local files.
 ```
 
 ## Work Log
-- 8/21/24: Set readme to describe ultimate scope. (wjplachno)
+- 8/22/24: Added command line deciphering. (wplachno)
+- 8/21/24: Set readme to describe ultimate scope. (wplachno)
