@@ -14,6 +14,7 @@ wcn [TEXT] -- Saves the text with a timestamp in the core file
 wcn -l -- Lists only the notes in the local file
 wcn -c -- Lists only the notes in the core file
 wcn -l [TEXT] -- Saves the text with a timestamp in the core file
+wcn -m [INDEX] -- Moves the note at the index to the other file
 wcn -d [INDEX] -- Deletes the note with the given index, core or local
 wcn -d -c -- Deletes all notes in the core file
 wcn -d -l -- Deletes all notes in the local file
@@ -23,6 +24,7 @@ wcn -m [INDEX_TARGET] [INDEX_DESTINATION] -- Moves the note at INDEX_TARGET to I
 ```
 
 ## ToDo
+- Convert functions and methods to the_proper_naming_scheme
 - Add wcnLibrary.py for orchestrating both the core and local file. 
 - Do we need to add a Note wrapper containing file and index?
 - Test scnLibrary just for file existence
@@ -33,6 +35,7 @@ wcn -m [INDEX_TARGET] [INDEX_DESTINATION] -- Moves the note at INDEX_TARGET to I
 - Add move functionality
 
 ## Work Log
+- 8/22/24: Added Library and routes for each mode. Also added MODE_PROMOTE to switch files. (wplachno)
 - 8/22/24: Added .gitignore, colors, test script, and models for Note and File. (wplachno)
 - 8/22/24: Added command line deciphering. (wplachno)
 - 8/21/24: Set readme to describe ultimate scope. (wplachno)

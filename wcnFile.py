@@ -14,6 +14,39 @@ class WCFile:
         self.notes = []
         self.file = None
 
+    def append(self, text):
+        newNote = WCNote().define(text)
+        self.notes.append(newNote)
+        return newNote
+
+    def appendNote(self, note):
+        self.notes.append(note)
+        return note
+
+    def remove(self,index):
+        return self.notes.pop(index)
+
+    def clear(self):
+        while len(self.notes):
+            self.notes.pop()
+
+    def insert(self, targetIndex, note):
+        self.notes.insert(targetIndex,note)
+
+    def move(self, target, destination):
+        dest = destination
+        if dest != target:
+            if dest > target:
+                dest = dest-1
+            targetNote = self.notes.pop(target)
+            self.notes.insert(dest, targetNote)
+
+    def edit(self, index, text):
+        self.notes[index].text = text
+
+    def reset(self, index, text):
+        self.notes[index].define(text)
+
     def load(self, path):
         self.path = path
         self.file = Scribe(path)

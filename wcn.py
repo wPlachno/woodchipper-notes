@@ -63,6 +63,10 @@ def decipher_command_line(args):
                 cl.type = S.MODE_DELETE_SINGLE
                 cl.target = args[2]
                 cl.description = S.CL_DESC_DELETE_SINGLE.format(cl.target)
+        elif args[1] == S.FLAG_MOVE:
+            cl.type = S.MODE_PROMOTE
+            cl.target = args[2]
+            cl.description = S.CL_DESC_PROMOTE.format(cl.target)
     return cl
 
 cl = decipher_command_line(sys.argv)
