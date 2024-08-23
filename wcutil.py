@@ -51,7 +51,7 @@ class Debug:
         self.is_active = active
         self.handlers = [message_handler]
 
-    def scribe(self, *message):
+    def scribe(self, message):
         if self.is_active:
             for handler in self.handlers:
                 handler(message)
@@ -152,6 +152,8 @@ class WoodChipperFile:
         self.path = pathlib.Path(filePath)
         self.name = self.path.name
         self.text = list(())
+        if not self.path.exists():
+            open(self.path, 'x')
 
     def read(self):
         with (open(self.path, "r")

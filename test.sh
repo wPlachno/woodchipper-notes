@@ -30,7 +30,7 @@ python3 wcn.py -e 1 "Save me!"
 printModeHeader "Edit Major (2)"
 python3 wcn.py -et 2 "Save us all!"
 printModeHeader "Move (1 -> 2)"
-python3 wcn.py -m 4 2
+python3 wcn.py -m 1 2
 printModeHeader "Delete Single (3)"
 python3 wcn.py -d 3
 printModeHeader "Delete Core"

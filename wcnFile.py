@@ -15,9 +15,11 @@ class WCFile:
         self.file = None
 
     def append(self, text):
-        newNote = WCNote().define(text)
+        newNote = WCNote()
+        newNote.define(text)
+        index = len(self.notes)
         self.notes.append(newNote)
-        return newNote
+        return index
 
     def appendNote(self, note):
         self.notes.append(note)
@@ -52,7 +54,9 @@ class WCFile:
         self.file = Scribe(path)
         self.file.read()
         for line in self.file.text:
-            self.notes.append(WCNote().read(line))
+            if line != S.EMPTY and line != S.NL:
+                newNote = WCNote()
+                self.notes.append(newNote.read(line))
 
     def save(self):
         fileText = list(())

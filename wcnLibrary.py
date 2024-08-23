@@ -1,5 +1,6 @@
 import sys
 import wcnFile
+from constants import LIB_CORE, LIB_LOCAL
 from wcnFile import WCFile
 import constants as S
 
@@ -16,6 +17,15 @@ class WCLibrary:
         self.core = WCFile()
         self.local = WCFile()
         self.cutoff = 0
+
+    def setPaths(self, homePath, workPath):
+        self.loadCore(homePath / S.FILE_NAME_CORE)
+        self.loadLocal(workPath / S.FILE_NAME_LOCAL)
+
+    def getPaths(self):
+        corePathLine = S.CL_DESC_CORE.format(self.core.path)
+        localPathLine = S.CL_DESC_LOCAL.format(self.local.path)
+        return corePathLine + localPathLine
 
     def loadCore(self, corePath):
         self.core.load(corePath)
@@ -69,28 +79,57 @@ class WCLibrary:
         return None
 
 
-    def listCore(self):
+    def describeCore(self):
         desc = S.EMPTY
+        curPtr = _WCLibraryPointer(S.LIB_CORE, -1)
         for index in range(0,len(self.core.notes)):
-            desc += str(index+1)+": "+S.COLOR_SUPER+"C"+S.COLOR_DEFAULT+self.core.notes[index]+S.NL
+            curPtr.index = index
+            desc += self.describeSingle(curPtr)
+        return desc
+
+    def listCore(self):
+        if len(self.core.notes) < 1:
+            return S.CL_DESC_NO_NOTES
+        return self.describeCore()
+
+    def describeSingle(self,pointer):
+        if pointer.lib == S.LIB_CORE:
+            userIndex = pointer.index+1
+            noteString = str(self.core.notes[pointer.index])
+            return S.CL_DESC_FRAME_CORE.format(str(userIndex), noteString)
+        elif pointer.lib == S.LIB_LOCAL:
+            userIndex = pointer.index + len(self.core.notes) +1
+            noteString = str(self.local.notes[pointer.index])
+            return S.CL_DESC_FRAME_LOCAL.format(str(userIndex), noteString)
+
+    def describeLocal(self):
+        desc = S.EMPTY
+        curPtr = _WCLibraryPointer(S.LIB_LOCAL, -1)
+        for index in range(0,len(self.local.notes)):
+            curPtr.index = index
+            desc += self.describeSingle(curPtr)
         return desc
 
     def listLocal(self):
-        currentIndex = len(self.core.notes)+1
-        desc = S.EMPTY
-        for index in range(0,len(self.local.notes)):
-            desc += str(currentIndex)+": "+S.COLOR_SIBLING+"L"+S.COLOR_DEFAULT+self.core.notes[index]+S.NL
-            currentIndex = currentIndex+1
-        return desc
+        if len(self.local.notes) < 1:
+            return S.CL_DESC_NO_NOTES
+        return self.describeLocal()
 
     def listAll(self):
-        return self.listCore() + self.listLocal()
+        text = S.EMPTY
+        if len(self.core.notes)<1 and len(self.local.notes)<1:
+            return S.CL_DESC_NO_NOTES
+        return self.describeCore() + self.describeLocal()
 
     def appendCore(self, text):
-        return self.core.append(text)
+        ptr = _WCLibraryPointer(S.LIB_CORE, self.core.append(text))
+        self.core.save()
+        return self.describeSingle(ptr)
 
     def appendLocal(self, text):
-        return self.local.append(text)
+        ptr = _WCLibraryPointer(S.LIB_LOCAL, self.local.append(text))
+        self.local.save()
+        return self.describeSingle(ptr)
 
     def editMajor(self, text, index):
         ptr = self.index2Pointer(index)
@@ -98,7 +137,7 @@ class WCLibrary:
             lib = self.pointer2Lib(ptr)
             lib.reset(ptr.index, text)
             lib.save()
-            return S.RESULT_SUCCESS
+            return self.describeSingle(ptr)
         else:
             return S.RESULT_FAILURE
 
@@ -108,7 +147,7 @@ class WCLibrary:
             lib = self.pointer2Lib(ptr)
             lib.edit(ptr.index, text)
             lib.save()
-            return S.RESULT_SUCCESS
+            return self.describeSingle(ptr)
         else:
             return S.RESULT_FAILURE
 
@@ -118,28 +157,34 @@ class WCLibrary:
             lib = self.pointer2Lib(ptr)
             lib.remove(ptr.index)
             lib.save()
-            return S.RESULT_SUCCESS
+            return "Note deleted."+S.NL
         else:
             return S.RESULT_FAILURE
 
     def deleteCore(self):
         self.core.clear()
+        self.core.save()
+        return S.CL_DESC_CORE.format("Cleared")
 
     def deleteLocal(self):
         self.local.clear()
+        self.local.save()
+        return S.CL_DESC_LOCAL.format("Cleared")
 
     def promote(self, target):
         targetPtr = self.index2Pointer(target)
         if self.isValidPointer(targetPtr):
             sourceLib = self.pointer2Lib(targetPtr)
+            destLibFlag = S.LIB_CORE
             destLib = self.core
-            if targetPtr.lib == S.LIB_LOCAL:
+            if targetPtr.lib == S.LIB_CORE:
+                destLibFlag = S.LIB_LOCAL
                 destLib = self.local
             targetText = sourceLib.remove(targetPtr.index).text
-            destLib.append(targetText)
+            destPtr = _WCLibraryPointer(destLibFlag,destLib.append(targetText))
             sourceLib.save()
             destLib.save()
-            return S.RESULT_SUCCESS
+            return self.describeSingle(destPtr)
         else:
             return S.RESULT_FAILURE
 
@@ -148,13 +193,13 @@ class WCLibrary:
         destPtr = self.index2Pointer(destination)
         if self.isValidPointer(targetPtr) and self.isValidPointer(destPtr):
             targetLib = self.pointer2Lib(targetPtr)
-            targetNote = targetLib.remove(targetPtr)
+            targetNote = targetLib.remove(targetPtr.index)
             destLib = self.pointer2Lib(destPtr)
             destLib.insert(destPtr.index, targetNote)
             targetLib.save()
             if targetPtr.lib != destPtr.lib:
                 destLib.save()
-            return S.RESULT_SUCCESS
+            return self.describeSingle(destPtr)
         else:
             return S.RESULT_FAILURE
 

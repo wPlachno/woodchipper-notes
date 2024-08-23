@@ -25,16 +25,9 @@ wcn -m [INDEX_TARGET] [INDEX_DESTINATION] -- Moves the note at INDEX_TARGET to I
 
 ## ToDo
 - Convert functions and methods to the_proper_naming_scheme
-- Add wcnLibrary.py for orchestrating both the core and local file. 
-- Do we need to add a Note wrapper containing file and index?
-- Test scnLibrary just for file existence
-- Add list functionality
-- Add append functionality
-- Add delete functionality
-- Add edit functionality
-- Add move functionality
 
 ## Work Log
+- 8/23/24: Added operate function and fixed bugs til feature complete. (wplachno)
 - 8/22/24: Added Library and routes for each mode. Also added MODE_PROMOTE to switch files. (wplachno)
 - 8/22/24: Added .gitignore, colors, test script, and models for Note and File. (wplachno)
 - 8/22/24: Added command line deciphering. (wplachno)
