@@ -27,6 +27,7 @@ wcn -m [INDEX_TARGET] [INDEX_DESTINATION] -- Moves the note at INDEX_TARGET to I
 - Convert functions and methods to the_proper_naming_scheme
 
 ## Work Log
+- 8/24/24: Added settings file and config route
 - 8/23/24: Added operate function and fixed bugs til feature complete. (wplachno)
 - 8/22/24: Added Library and routes for each mode. Also added MODE_PROMOTE to switch files. (wplachno)
 - 8/22/24: Added .gitignore, colors, test script, and models for Note and File. (wplachno)
