@@ -6,7 +6,7 @@ import wcutil
 from pathlib import Path
 
 from wcnLibrary import WCLibrary
-from wcutil import str2Bool, bool2Str
+from wcutil import bool_from_user, string_from_bool
 
 settings = wcutil.WoodchipperSettingsFile()
 settings.load()
@@ -170,8 +170,8 @@ def decipher_command_line(args):
             elif args[2] == S.FLAG_VERBOSE:
                 cl.target = S.DISPLAY_COMMAND
                 cl.text = S.TAG_VERBOSE
-            cl.destination = str2Bool(args[3])
-            cl.description = S.CL_DESC_CONFIG.format(cl.text, wcutil.bool2Str(cl.destination, True))
+            cl.destination = bool_from_user(args[3])
+            cl.description = S.CL_DESC_CONFIG.format(cl.text, wcutil.string_from_bool(cl.destination, True))
 
     return cl
 
@@ -179,7 +179,7 @@ def operate(cl, lib):
     match cl.type:
         # Mode: Config
         case S.MODE_CONFIG:
-            settings[cl.target] = bool2Str(cl.destination)
+            settings[cl.target] = string_from_bool(cl.destination)
             settings.save()
             dbg(cl.description)
             cl.success = True
