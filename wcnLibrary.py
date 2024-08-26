@@ -122,14 +122,22 @@ class WCLibrary:
         return self.describeCore() + self.describeLocal()
 
     def appendCore(self, text):
-        ptr = _WCLibraryPointer(S.LIB_CORE, self.core.append(text))
+        return_text = S.EMPTY
+        text_pieces = text.split("\n")
+        for text_line in text_pieces:
+            ptr = _WCLibraryPointer(S.LIB_CORE, self.core.append(text_line))
+            return_text = return_text + self.describeSingle(ptr)
         self.core.save()
-        return self.describeSingle(ptr)
+        return return_text
 
     def appendLocal(self, text):
-        ptr = _WCLibraryPointer(S.LIB_LOCAL, self.local.append(text))
+        return_text = S.EMPTY
+        text_pieces = text.split("\n")
+        for text_line in text_pieces:
+            ptr = _WCLibraryPointer(S.LIB_LOCAL, self.local.append(text_line))
+            return_text = return_text + self.describeSingle(ptr)
         self.local.save()
-        return self.describeSingle(ptr)
+        return return_text
 
     def editMajor(self, text, index):
         ptr = self.index2Pointer(index)
