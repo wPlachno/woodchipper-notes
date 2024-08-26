@@ -243,13 +243,13 @@ def operate(cl, lib):
             print(S.RESULT_FAILURE)
             cl.success = False
 
-def _main(*args):
+def _main(args):
     settings = wcutil.WoodchipperSettingsFile()
     settings.load()
     debug = wcutil.Debug(active=(settings.get_debug()))
     dbg = debug.scribe
 
-    cl = decipher_command_line(sys.argv)
+    cl = decipher_command_line(args)
     if settings.get_or_default(S.DISPLAY_COMMAND, S.TAG_ON) == S.TAG_ON or settings.get_debug():
         print(cl.description)
 
