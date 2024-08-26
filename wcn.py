@@ -8,12 +8,9 @@ from pathlib import Path
 from wcnLibrary import WCLibrary
 from wcutil import bool_from_user, string_from_bool
 
-settings = wcutil.WoodchipperSettingsFile()
-settings.load()
-debug = wcutil.Debug(active=(settings.get_debug()))
-dbg = debug.scribe
-
-
+settings = None
+debug = None
+dbg = None
 
 class CommandLineInformation:
     def __init__(self):
@@ -246,12 +243,20 @@ def operate(cl, lib):
             print(S.RESULT_FAILURE)
             cl.success = False
 
+def _main(*args):
+    settings = wcutil.WoodchipperSettingsFile()
+    settings.load()
+    debug = wcutil.Debug(active=(settings.get_debug()))
+    dbg = debug.scribe
 
-cl = decipher_command_line(sys.argv)
-if settings.get_or_default(S.DISPLAY_COMMAND, S.TAG_ON) == S.TAG_ON:
-    print(cl.description)
+    cl = decipher_command_line(sys.argv)
+    if settings.get_or_default(S.DISPLAY_COMMAND, S.TAG_ON) == S.TAG_ON or settings.get_debug():
+        print(cl.description)
 
-lib = WCLibrary()
-lib.setPaths(Path.home(), Path(os.getcwd()))
-dbg(lib.getPaths())
-operate(cl,lib)
+    lib = WCLibrary()
+    lib.setPaths(Path.home(), Path(os.getcwd()))
+    dbg(lib.getPaths())
+    operate(cl,lib)
+
+if __name__ == "__main__":
+    _main(sys.argv)
