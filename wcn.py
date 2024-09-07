@@ -101,7 +101,7 @@ def decipher_command_line(args):
             cl.description = S.CL_DESC_PROMOTE.format(args[2])
 
         # Delete Mode Subgroup:
-        elif args[1] == S.FLAG_DELETE:
+        elif args[1] == S.FLAG_DELETE or args[1] == S.FLAG_REMOVE:
 
             # Mode: Delete Core
             if args[2] == S.FLAG_CORE:
@@ -153,7 +153,7 @@ def decipher_command_line(args):
             cl.description = S.CL_DESC_EDIT_MINOR.format(cl.text, args[2])
 
         # Mode: Delete Single (With library specification)
-        elif args[1] == S.FLAG_DELETE and (args[2] == S.FLAG_LOCAL or args[2] == S.FLAG_CORE):
+        elif (args[1] == S.FLAG_DELETE or args[1] == S.FLAG_REMOVE) and (args[2] == S.FLAG_LOCAL or args[2] == S.FLAG_CORE):
             cl.type = S.MODE_DELETE_SINGLE
             cl.target = int(args[3])
             cl.description = S.CL_DESC_DELETE_SINGLE.format(args[3])
