@@ -303,24 +303,22 @@ def bool_from_user(raw_text:str):
     return False
 
 
-def decipher_command_line(arguments, flags):
+def decipher_command_line(arguments, flags: FlagFarm):
     """
-    Gets the target directory paths, either as a command line argument
-    or the working directory. Also deciphers the rest of the command
-    line arguments for flags like VERBOSE and HISTORY
-    :return: A list of directory paths
+    Deciphers the command line by parsing through arguments,
+    affecting FlagFarm flags with each one, and adding it to
+    a return value array if it does not match a flag.
+    :return: A list of command line targets
     """
     # Decipher the command line arguments
-    target_directories = []
+    targets = []
     for cl_argument in arguments[1:]:
-        arg_as_flag = cl_argument.upper()
+        arg_as_flag = cl_argument.lower()
         if flags.has_flag(arg_as_flag):
             flags.activate(arg_as_flag)
         else:
-            target_directories.append(cl_argument)
-    if len(target_directories) < 1:
-        target_directories.append(pathlib.Path().resolve())
-    return target_directories
+            targets.append(cl_argument)
+    return targets
 
 
 def run_on_sorted_list(target_list, function_given_item):
