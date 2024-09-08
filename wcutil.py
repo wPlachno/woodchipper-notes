@@ -320,6 +320,31 @@ def decipher_command_line(arguments, flags: FlagFarm):
             targets.append(cl_argument)
     return targets
 
+def convert_to_array(target):
+    """
+    Takes whatever is passed in and returns it inside
+    of a list, unless it was already a list.
+    :param target: anything
+    :return: target inside a list or target if target is already a list.
+    """
+    if target.__class__ is list:
+        return target
+    return [target]
+
+def process_str_array_new_lines(target):
+    """
+    Given a list of strings, breaks up each new line
+    into two separate strings
+    :param target: A list of strings
+    :return: a list of more strings with no new lines
+    """
+    newLines = list(())
+    for _string in target:
+        for line in _string.split('\n'):
+            if len(line) > 0:
+                newLines.append(line)
+    return newLines
+
 
 def run_on_sorted_list(target_list, function_given_item):
     """
