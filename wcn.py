@@ -184,12 +184,12 @@ def _main(args):
     cl = decipher_command_line(args)
     if settings.get_or_default(S.DISPLAY_COMMAND, S.TAG_ON) == S.TAG_ON or settings.get_debug():
         print(cl.description)
-"""
+
     lib = WCLibrary()
     lib.setPaths(Path.home(), Path(os.getcwd()))
     dbg(lib.getPaths())
     operate(cl,lib)
-"""
+
 
 if __name__ == "__main__":
     _main(sys.argv)
