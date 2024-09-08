@@ -5,6 +5,7 @@ import constants as S
 import wcutil
 from pathlib import Path
 
+from constants import LIB_CORE, LIB_LOCAL
 from wcnLibrary import WCLibrary
 from wcutil import bool_from_user, string_from_bool
 
@@ -16,6 +17,7 @@ class CommandLineInformation:
     def __init__(self):
         self.success = False
         self.type = S.EMPTY
+        self.libraries = S.LIB_ALL
         self.text = S.EMPTY
         self.target = S.EMPTY
         self.destination = S.EMPTY
@@ -24,152 +26,82 @@ class CommandLineInformation:
 
 def decipher_command_line(args):
     cl = CommandLineInformation()
+    flags = wcutil.FlagFarm(S.FLAG_LIST)
+    nodes = wcutil.decipher_command_line(args, flags)
+    if flags[S.FLAG_CORE]:
+        cl.libraries = LIB_CORE
+    elif flags[S.FLAG_LOCAL]:
+        cl.libraries = LIB_LOCAL
 
-    # Modes with 1 arg:
-    #
-    #  | MODE      | args[0] |
-    # -|-----------|---------|
-    # -| List All  | wcn     |
-    # -|-----------|---------|
-    #
-    if len(args) == 1:
+    cl.type = S.MODE_LIST_ALL
+    cl.description = S.CL_DESC_LIST_ALL
 
-        # Mode: List All
-        cl.type = S.MODE_LIST_ALL
-        cl.description = S.CL_DESC_LIST_ALL
-
-    # Modes with 2 args:
-    #
-    #  | MODE          | args[0] | args[1] |
-    # -|---------------|---------|---------|
-    # -| List Core     | wcn     | -c      |
-    # -| List Local    | wcn     | -l      |
-    # -| Delete All    | wcn     | -d      |
-    # -| Debug         | wcn     | -debug  |
-    # -| Append Core   | wcn     | [TEXT]  |
-    # -|---------------|---------|---------|
-    elif len(args) == 2:
-
-        # Mode: List Core
-        if args[1] == S.FLAG_CORE:
-            cl.type = S.MODE_LIST_CORE
-            cl.description = S.CL_DESC_LIST_CORE
-
-        # Mode: List Local
-        elif args[1] == S.FLAG_LOCAL:
-            cl.type = S.MODE_LIST_LOCAL
-            cl.description = S.CL_DESC_LIST_LOCAL
-
-        # Mode: Delete All
-        elif args[1] == S.FLAG_DELETE:
-            cl.type = S.MODE_DELETE_ALL
-            cl.description = S.CL_DESC_DELETE_ALL
-
-        # Mode: Debug
-        elif args[1] == S.FLAG_DEBUG:
-            cl.type = S.MODE_DEBUG
-            cl.description = S.CL_DESC_DEBUG_TASK
-
-        # Mode: Append Core
-        else:
-            cl.type = S.MODE_APPEND_CORE
-            cl.text = args[1]
-            cl.description = S.CL_DESC_APPEND_CORE.format(cl.text)
-
-    # Modes with 3 args:
-    #
-    #  | MODE          | args[0] | args[1] | args[2]  |
-    # -|---------------|---------|---------|----------|
-    # -| Append Local  | wcn     | -l      | [TEXT]   |
-    # -| Promote       | wcn     | -m      | [TARGET] |
-    # -| Delete Core   | wcn     | -d      | -c       |
-    # -| Delete Local  | wcn     | -d      | -l       |
-    # -| Delete Single | wcn     | -d      | [TARGET] |
-    # -|---------------|---------|---------|----------|
-    elif len(args) == 3:
-
-        # Mode: Append Local
-        if args[1] == S.FLAG_LOCAL:
-            cl.type = S.MODE_APPEND_LOCAL
-            cl.text = args[2]
-            cl.description = S.CL_DESC_APPEND_LOCAL.format(cl.text)
-
-        # Mode: Promote
-        elif args[1] == S.FLAG_MOVE:
-            cl.type = S.MODE_PROMOTE
-            cl.target = int(args[2])
-            cl.description = S.CL_DESC_PROMOTE.format(args[2])
-
-        # Delete Mode Subgroup:
-        elif args[1] == S.FLAG_DELETE or args[1] == S.FLAG_REMOVE:
-
-            # Mode: Delete Core
-            if args[2] == S.FLAG_CORE:
+    if flags[S.FLAG_DELETE] or flags[S.FLAG_REMOVE]:    # -d or -r
+        if len(nodes)>0:                                # -d [target]
+            cl.type = S.MODE_DELETE_SINGLE
+            cl.target = int(nodes[0])
+            cl.description = S.CL_DESC_DELETE_SINGLE.format(cl.target)
+        else:                                           # -d
+            if cl.libraries == S.LIB_ALL:
+                cl.type = S.MODE_DELETE_ALL
+                cl.description = S.CL_DESC_DELETE_ALL
+            elif cl.libraries == S.LIB_CORE:
                 cl.type = S.MODE_DELETE_CORE
                 cl.description = S.CL_DESC_DELETE_CORE
-
-            # Mode: Delete Local
-            elif args[2] == S.FLAG_LOCAL:
+            else:
                 cl.type = S.MODE_DELETE_LOCAL
                 cl.description = S.CL_DESC_DELETE_LOCAL
-
-            # Mode: Delete Single
-            else:
-                cl.type = S.MODE_DELETE_SINGLE
-                cl.target = int(args[2])
-                cl.description = S.CL_DESC_DELETE_SINGLE.format(args[2])
-
-    # Modes with 4 args:
-    #
-    #  | MODE          | args[0] | args[1] | args[2]          | args[3]
-    # -|---------------|---------|---------|------------------|---------------|
-    # -| Move          | wcn     | -m      | [TARGET]         | [DESTINATION] |
-    # -| Edit Major    | wcn     | -et     | [TARGET]         | [TEXT]        |
-    # -| Edit Minor    | wcn     | -e      | [TARGET]         | [TEXT]        |
-    # -| Delete Single | wcn     | -d      | -[c/l]           | [TARGET]      |
-    # -| Config        | wcn     | -config | -[debug/verbose] | [on/off]      |
-    # -|---------------|---------|---------|------------------|---------------|
-    elif len(args) == 4:
-
-        # Mode: Move
-        if args[1] == S.FLAG_MOVE:
+    elif flags[S.FLAG_MOVE]:                            # -m
+        if len(nodes) == 2:                             # -m [target] [destination]
             cl.type = S.MODE_MOVE
-            cl.target = int(args[2])
-            cl.destination = int(args[3])
-            cl.description = S.CL_DESC_MOVE.format(args[2], args[3])
-
-        # Mode: Edit Major
-        elif args[1] == S.FLAG_EDIT_MAJOR:
-            cl.type = S.MODE_EDIT_MAJOR
-            cl.target = int(args[2])
-            cl.text = args[3]
-            cl.description = S.CL_DESC_EDIT_MAJOR.format(cl.text, args[2])
-
-        # Mode: Edit Minor
-        elif args[1] == S.FLAG_EDIT_MINOR:
+            cl.target = int(nodes[0])
+            cl.destination = int(nodes[1])
+            cl.description = S.CL_DESC_MOVE.format(cl.target, cl.destination)
+        elif len(nodes) == 1:                           # -m [target]
+            cl.type = S.MODE_PROMOTE
+            cl.target = int(nodes[0])
+            cl.description = S.CL_DESC_PROMOTE.format(cl.target)
+    elif flags[S.FLAG_CONFIG]:                          # -config
+        cl.type = S.MODE_CONFIG
+        if flags[S.FLAG_DEBUG]:                         # -config -debug [val]
+            cl.target = S.TAG_DEBUG
+            cl.text = S.TAG_DEBUG
+        elif flags[S.FLAG_VERBOSE]:                     # -config -verbose [val]
+            cl.target = S.DISPLAY_COMMAND
+            cl.text = S.TAG_VERBOSE
+        cl.destination = bool_from_user(nodes[0] if len(nodes)>0 else False)
+        cl.description = S.CL_DESC_CONFIG.format(cl.text, wcutil.string_from_bool(cl.destination, True))
+    elif flags[S.FLAG_EDIT_MINOR]:                      # -e
+        if len(nodes) == 2:
             cl.type = S.MODE_EDIT_MINOR
-            cl.target = int(args[2])
-            cl.text = args[3]
-            cl.description = S.CL_DESC_EDIT_MINOR.format(cl.text, args[2])
-
-        # Mode: Delete Single (With library specification)
-        elif (args[1] == S.FLAG_DELETE or args[1] == S.FLAG_REMOVE) and (args[2] == S.FLAG_LOCAL or args[2] == S.FLAG_CORE):
-            cl.type = S.MODE_DELETE_SINGLE
-            cl.target = int(args[3])
-            cl.description = S.CL_DESC_DELETE_SINGLE.format(args[3])
-
-        # Mode: Config
-        elif args[1] == S.FLAG_CONFIG:
-            cl.type = S.MODE_CONFIG
-            if args[2] == S.FLAG_DEBUG:
-                cl.target = S.TAG_DEBUG
-                cl.text = S.TAG_DEBUG
-            elif args[2] == S.FLAG_VERBOSE:
-                cl.target = S.DISPLAY_COMMAND
-                cl.text = S.TAG_VERBOSE
-            cl.destination = bool_from_user(args[3])
-            cl.description = S.CL_DESC_CONFIG.format(cl.text, wcutil.string_from_bool(cl.destination, True))
-
+            cl.target = int(nodes[0])
+            cl.text = nodes[1]
+            cl.description = S.CL_DESC_EDIT_MINOR.format(cl.text, cl.target)
+    elif flags[S.FLAG_EDIT_MAJOR]:                      # -et
+        if len(nodes) == 2:
+            cl.type = S.MODE_EDIT_MAJOR
+            cl.target = int(nodes[0])
+            cl.text = nodes[1]
+            cl.description = S.CL_DESC_EDIT_MAJOR.format(cl.text, cl.target)
+    else:
+        if len(nodes)>0:                                # [targets] APPEND
+            match cl.libraries:
+                case S.LIB_LOCAL:
+                    cl.type = S.MODE_APPEND_LOCAL
+                    cl.text = nodes[0]
+                    cl.description = S.CL_DESC_APPEND_LOCAL.format(cl.text)
+                case _:
+                    cl.type = S.MODE_APPEND_CORE
+                    cl.text = nodes[0]
+                    cl.description = S.CL_DESC_APPEND_CORE.format(cl.text)
+        else:                                           # LIST
+            match cl.libraries:
+                case S.LIB_CORE:
+                    cl.type = S.MODE_LIST_CORE
+                    cl.description = S.CL_DESC_LIST_CORE
+                case S.LIB_LOCAL:
+                    cl.type = S.MODE_LIST_LOCAL
+                    cl.description = S.CL_DESC_LIST_LOCAL
     return cl
 
 def operate(cl, lib):
@@ -252,11 +184,12 @@ def _main(args):
     cl = decipher_command_line(args)
     if settings.get_or_default(S.DISPLAY_COMMAND, S.TAG_ON) == S.TAG_ON or settings.get_debug():
         print(cl.description)
-
+"""
     lib = WCLibrary()
     lib.setPaths(Path.home(), Path(os.getcwd()))
     dbg(lib.getPaths())
     operate(cl,lib)
+"""
 
 if __name__ == "__main__":
     _main(sys.argv)

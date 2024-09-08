@@ -77,12 +77,25 @@ FLAG_CORE = "-c"
 FLAG_LOCAL = "-l"
 FLAG_EDIT_MINOR = "-e"
 FLAG_EDIT_MAJOR = "-et"
-FLAG_MOVE = "-m"
 FLAG_DELETE = "-d"
 FLAG_REMOVE = "-r"
+FLAG_MOVE = "-m"
 FLAG_DEBUG = "-debug"
 FLAG_VERBOSE = "-verbose"
 FLAG_CONFIG = "-config"
+
+FLAG_LIST = list((
+    FLAG_CORE,          # LIB: Core
+    FLAG_LOCAL,         # LIB: Local
+    FLAG_DELETE,        # MODE: Delete a note
+    FLAG_REMOVE,        # MODE: Delete a note
+    FLAG_EDIT_MINOR,    # MODE: Edit the note, text only
+    FLAG_EDIT_MAJOR,    # MODE: Edit the note, fully. Essential a replace.
+    FLAG_MOVE,          # MODE: Move the note
+    FLAG_CONFIG,        # MODE: Configuration mode. Allows editing of:
+    FLAG_DEBUG,         # CONF: Whether to print debug statements.
+    FLAG_VERBOSE,       # CONF: Whether to print the task and inputs.
+))
 
 
 FILE_NAME_CORE = ".wcn_Core.txt"
@@ -96,10 +109,11 @@ TAG_FALSE = "false"
 TAG_ON = "on"
 TAG_OFF = "off"
 
+
 LIB_CORE = "C"
 LIB_LOCAL = "L"
 LIB_ERROR = "E"
-
+LIB_ALL = "A"
 TIME_READABLE = "%m/%d/%Y, %H:%M:%S"
 TIME_EPOCH = "%s"
 
