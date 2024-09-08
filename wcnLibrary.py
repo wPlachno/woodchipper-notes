@@ -161,15 +161,16 @@ class WCLibrary:
             return S.RESULT_FAILURE
 
     def deleteSingle(self, target):
-        target_indices = wcutil.convert_to_array(target)
+        sorted_string_array = wcutil.convert_to_array(target)
+        sorted_string_array.sort(reverse=True)
+        target_indices = [int(item) for item in sorted_string_array]
         text = S.EMPTY
         for index in target_indices:
             ptr = self.index2Pointer(int(index))
             if self.isValidPointer(ptr):
                 lib = self.pointer2Lib(ptr)
-                lib.remove(ptr.index)
+                text = S.CL_DESC_DELETED_NODE.format(lib.remove(ptr.index)) + text
                 lib.save()
-                text += "Note deleted."+S.NL
             else:
                 return S.RESULT_FAILURE
         return text
