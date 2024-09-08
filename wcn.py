@@ -39,8 +39,8 @@ def decipher_command_line(args):
     if flags[S.FLAG_DELETE] or flags[S.FLAG_REMOVE]:    # -d or -r
         if len(nodes)>0:                                # -d [target]
             cl.type = S.MODE_DELETE_SINGLE
-            cl.target = int(nodes[0])
-            cl.description = S.CL_DESC_DELETE_SINGLE.format(cl.target)
+            cl.target = nodes
+            cl.description = S.CL_DESC_DELETE_SINGLE.format(str(cl.target))
         else:                                           # -d
             if cl.libraries == S.LIB_ALL:
                 cl.type = S.MODE_DELETE_ALL
@@ -88,12 +88,12 @@ def decipher_command_line(args):
             match cl.libraries:
                 case S.LIB_LOCAL:
                     cl.type = S.MODE_APPEND_LOCAL
-                    cl.text = nodes[0]
-                    cl.description = S.CL_DESC_APPEND_LOCAL.format(cl.text)
+                    cl.text = nodes
+                    cl.description = S.CL_DESC_APPEND_LOCAL.format(str(cl.text))
                 case _:
                     cl.type = S.MODE_APPEND_CORE
-                    cl.text = nodes[0]
-                    cl.description = S.CL_DESC_APPEND_CORE.format(cl.text)
+                    cl.text = nodes
+                    cl.description = S.CL_DESC_APPEND_CORE.format(str(cl.text))
         else:                                           # LIST
             match cl.libraries:
                 case S.LIB_CORE:
@@ -111,13 +111,6 @@ def operate(cl, lib):
             settings[cl.target] = string_from_bool(cl.destination)
             settings.save()
             dbg(cl.description)
-            cl.success = True
-        # Mode: Debug
-        case S.MODE_DEBUG:
-            settings.flip_debug()
-            settings.save()
-            debugText = S.CL_DESC_ACTIVE if settings.get_debug() else S.CL_DESC_INACTIVE
-            print(S.CL_DESC_ATTRIBUTE.format("Debug", debugText))
             cl.success = True
         # Mode: List All
         case S.MODE_LIST_ALL:

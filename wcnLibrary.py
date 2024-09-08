@@ -1,5 +1,6 @@
 import sys
 import wcnFile
+import wcutil
 from constants import LIB_CORE, LIB_LOCAL
 from wcnFile import WCFile
 import constants as S
@@ -123,7 +124,7 @@ class WCLibrary:
 
     def appendCore(self, text):
         return_text = S.EMPTY
-        text_pieces = text.split("\n")
+        text_pieces = wcutil.process_str_array_new_lines(wcutil.convert_to_array(text))
         for text_line in text_pieces:
             ptr = _WCLibraryPointer(S.LIB_CORE, self.core.append(text_line))
             return_text = return_text + self.describeSingle(ptr)
@@ -132,7 +133,7 @@ class WCLibrary:
 
     def appendLocal(self, text):
         return_text = S.EMPTY
-        text_pieces = text.split("\n")
+        text_pieces = wcutil.process_str_array_new_lines(wcutil.convert_to_array(text))
         for text_line in text_pieces:
             ptr = _WCLibraryPointer(S.LIB_LOCAL, self.local.append(text_line))
             return_text = return_text + self.describeSingle(ptr)
@@ -160,14 +161,18 @@ class WCLibrary:
             return S.RESULT_FAILURE
 
     def deleteSingle(self, target):
-        ptr = self.index2Pointer(target)
-        if self.isValidPointer(ptr):
-            lib = self.pointer2Lib(ptr)
-            lib.remove(ptr.index)
-            lib.save()
-            return "Note deleted."+S.NL
-        else:
-            return S.RESULT_FAILURE
+        target_indices = wcutil.convert_to_array(target)
+        text = S.EMPTY
+        for index in target_indices:
+            ptr = self.index2Pointer(int(index))
+            if self.isValidPointer(ptr):
+                lib = self.pointer2Lib(ptr)
+                lib.remove(ptr.index)
+                lib.save()
+                text += "Note deleted."+S.NL
+            else:
+                return S.RESULT_FAILURE
+        return text
 
     def deleteCore(self):
         self.core.clear()
